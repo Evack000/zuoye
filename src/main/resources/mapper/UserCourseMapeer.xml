@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zs.zuoye.dao.CourseregistrationDao">
+    <resultMap id="userMap" type="com.zs.zuoye.relations.courseregistration">
+        <id property="userId" column="userId"  javaType="java.lang.Integer"/>
+        <result property="courseId" column="courseId" javaType="java.lang.String"/>
+    </resultMap>
+
+    <insert id="addRelation" parameterType="com.zs.zuoye.relations.courseregistration">
+        insert into courseregistration(userId,courseId)
+        values(#{userId},#{courseId})
+    </insert>
+
+</mapper>

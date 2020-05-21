@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zs.zuoye.dao.UserDao">
+
+
+    <resultMap id="userMap" type="com.zs.zuoye.entity.User">
+        <id property="userId" column="userId"  javaType="java.lang.Integer"/>
+        <result property="userName" column="userName" javaType="java.lang.String"/>
+        <result property="userPwd" column="userPwd" javaType="java.lang.String"/>
+        <result property="profileName" column="profileName" javaType="java.lang.String"/>
+        <result property="userPromission" column="userPromission" javaType="java.lang.String"/>
+        <collection property="roles" javaType="List" ofType="com.zs.zuoye.entity.Role" >
+            <id property="id" column="rid" javaType="java.lang.Integer"/>
+            <result property="name" column="rname" javaType="java.lang.String"/>
+            <result property="description" column="rdescription" javaType="java.lang.String"/>
+            <collection property="permissions" javaType="List" ofType="com.zs.zuoye.entity.Permission" >
+                <id property="id" column="pid" javaType="java.lang.Integer"/>
+                <result property="name" column="pname" javaType="java.lang.String"/>
+                <result property="description" column="pdescription" javaType="java.lang.String"/>
+                <result property="url" column="url" javaType="java.lang.String"/>
+                <result property="fid" column="fid" javaType="java.lang.Integer"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <resultMap id="count" type="Integer">
+        <result property="count" column="count"/>
+    </resultMap>
+
+    <resultMap id="userroleMap" type="com.zs.zuoye.relations.user_role">
+        <id property="id" column="id"  javaType="java.lang.Integer"/>
+        <result property="user_id" column="user_id" javaType="java.lang.Integer"/>
+        <result property="role_id" column="role_id" javaType="java.lang.Integer"/>
+    </resultMap>
+
+    <select id="getUserByName" parameterType="String" resultMap="userMap">
+        	select u.*,
+        	       r.id as rid , r.name as rname , r.description as rdescription,
+        	       p.id as pid , p.name as pname , p.description as pdescription, p.url , p.fid
+        	from user u,relation_user_role rur,role r,relation_role_permission rrp,permission p
+            where u.userName = #{userName} and u.userId=rur.user_id and rur.role_id= r.id
+            and r.id=rrp.role_id and rrp.permission_id = p.id
+    </select>
+
+    <select id="getUser" parameterType="Integer" resultMap="userMap">
+        	select * from user
+            where userId = #{userId}
+    </select>
+
+    <select id="findAll" resultMap="userCourse">
+        select * from user
+        <if test="sortKey != null and sortOrder != null">
+            order by ${sortKey}  ${sortOrder}
+        </if>
+
+        <if test="startPer != null and perPage != null">
+            limit #{startPer} ,#{perPage};
+        </if>
+    </select>
+
+
+
+    <select id="selectCount" resultMap="count">
+        SELECT COUNT(*) as count
+        from user u
+    </select>
+
+    <update id="updateUser" parameterType="com.zs.zuoye.entity.User">
+        update user
+        set userName = #{userName},  userPwd = #{userPwd} ,profileName = #{profileName},userPromission = #{userPromission}
+        where id = #{id}
+    </update>
+
+
+
+
+
+
+
+
+
+
+    <resultMap id="userCourse" type="com.zs.zuoye.entity.User">
+        <id property="userId" column="userId"  javaType="java.lang.Integer"/>
+        <result property="userName" column="userName" javaType="java.lang.String"/>
+        <result property="userPwd" column="userPwd" javaType="java.lang.String"/>
+        <result property="profileName" column="profileName" javaType="java.lang.String"/>
+        <result property="userPromission" column="userPromission" javaType="java.lang.String"/>
+        <collection property="courses" javaType="List" ofType="com.zs.zuoye.entity.Course" >
+            <id property="courseId" column="courseId"/>
+            <result property="courseName" column="courseName"/>
+            <result property="courseDetail" column="courseDetail"/>
+        </collection>
+    </resultMap>
+
+    <select id="getUserCourse" parameterType="Integer" resultMap="userCourse">
+        	select u.*,
+        	       c.courseId,c.courseName,c.courseDetail
+        	from user u,courseregistration cu,course c
+            where u.userId = #{userId} and u.userId=cu.userid and cu.courseid= c.courseId
+    </select>
+
+</mapper>
